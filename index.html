@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#071a15">
+  <meta name="description" content="送你一棵藏着星光的圣诞树。轻触、转动，再许一个小小的愿望。">
+  <meta property="og:title" content="给小颖的冬日来信">
+  <meta property="og:description" content="打开这封冬日来信，收下一点星光。">
+  <title>给小颖的冬日来信</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23071a15'/%3E%3Ctext y='.88em' x='12' font-size='80'%3E%E2%9C%A7%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="./fonts/christmas-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/winter-letter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/winter-title.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./styles.css?v=20261120-11">
+  <script src="./app.js?v=20261120-11" defer></script>
+</head>
+<body>
+  <main class="postcard" id="postcard">
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="wordmark" href="#" aria-label="给小颖的冬日来信，回到圣诞树"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M230.32,187.09l-46-59.09H208a8,8,0,0,0,6.34-12.88l-80-104a8,8,0,0,0-12.68,0l-80,104A8,8,0,0,0,48,128H71.64l-46,59.09A8,8,0,0,0,32,200h88v40a8,8,0,0,0,16,0V200h88a8,8,0,0,0,6.32-12.91ZM48.36,184l46-59.09A8,8,0,0,0,88,112H64.25L128,29.12,191.75,112H168a8,8,0,0,0-6.31,12.91L207.64,184Z"/></svg><span>给小颖的冬日来信</span></a>
+      <div class="top-actions">
+        <button class="icon-button" id="replay" type="button" aria-label="重看星光汇聚成圣诞树的动画" title="再看一次"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M224,128a96,96,0,0,1-94.71,96H128A95.38,95.38,0,0,1,62.1,197.8a8,8,0,0,1,11-11.63A80,80,0,1,0,71.43,71.39a3.07,3.07,0,0,1-.26.25L44.59,96H72a8,8,0,0,1,0,16H24a8,8,0,0,1-8-8V56a8,8,0,0,1,16,0V85.8L60.25,60A96,96,0,0,1,224,128Z"/></svg></button>
+        <button class="icon-button music-button" id="music" type="button" aria-label="开启音乐" aria-pressed="false" title="开启音乐"><span class="music-off"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M53.92,34.62A8,8,0,1,0,42.08,45.38L73.55,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V175.09l42.08,46.29a8,8,0,1,0,11.84-10.76ZM32,96H72v64H32ZM144,207.64,88,164.09V95.89l56,61.6Zm42-63.77a24,24,0,0,0,0-31.72,8,8,0,1,1,12-10.57,40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.59Zm-80.16-76a8,8,0,0,1,1.4-11.23l39.85-31A8,8,0,0,1,160,32v74.83a8,8,0,0,1-16,0V48.36l-26.94,21A8,8,0,0,1,105.84,67.91ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z"/></svg></span><span class="music-on" hidden><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M155.51,24.81a8,8,0,0,0-8.42.88L77.25,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H77.25l69.84,54.31A8,8,0,0,0,160,224V32A8,8,0,0,0,155.51,24.81ZM32,96H72v64H32ZM144,207.64,88,164.09V91.91l56-43.55Zm54-106.08a40,40,0,0,1,0,52.88,8,8,0,0,1-12-10.58,24,24,0,0,0,0-31.72,8,8,0,0,1,12-10.58ZM248,128a79.9,79.9,0,0,1-20.37,53.34,8,8,0,0,1-11.92-10.67,64,64,0,0,0,0-85.33,8,8,0,1,1,11.92-10.67A79.83,79.83,0,0,1,248,128Z"/></svg></span></button>
+      </div>
+    </header>
+
+    <section class="greeting" aria-labelledby="title">
+      <p class="dedication" id="dedication">把这个冬天的温柔，送给你</p>
+      <h1 id="title"><span>Merry</span><em>Christmas</em></h1>
+      <p class="greeting-line" id="greeting-line">愿你所念，皆有回响。</p>
+    </section>
+
+    <button class="tree-touch" id="tree-touch" type="button" aria-label="轻触圣诞树散开星光，也可以左右拖动旋转"></button>
+    <button class="star-touch" id="star-touch" type="button" aria-label="轻触树顶星星，收到一条隐藏祝福" title="星星里，藏着一句话"></button>
+
+    <div class="bottom-area">
+      <p class="touch-hint" id="touch-hint">轻触有星光，树顶藏着小惊喜</p>
+      <div class="bottom-actions">
+        <button class="wish-button" id="wish" type="button"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg><span>许一个愿望</span></button>
+        <button class="share-button" id="share" type="button" aria-label="把圣诞树送给朋友"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M227.32,28.68a16,16,0,0,0-15.66-4.08l-.15,0L19.57,82.84a16,16,0,0,0-2.49,29.8L102,154l41.3,84.87A15.86,15.86,0,0,0,157.74,248q.69,0,1.38-.06a15.88,15.88,0,0,0,14-11.51l58.2-191.94c0-.05,0-.1,0-.15A16,16,0,0,0,227.32,28.68ZM157.83,231.85l-.05.14,0-.07-40.06-82.3,48-48a8,8,0,0,0-11.31-11.31l-48,48L24.08,98.25l-.07,0,.14,0L216,40Z"/></svg></button>
+      </div>
+      <p class="sign-off">愿所有美好，都在来的路上。</p>
+    </div>
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+    <div class="celebration" id="celebration" aria-hidden="true"><span>心愿已点亮</span><p>让星光陪它，慢慢实现。</p></div>
+    <noscript><p class="no-script">请在支持 JavaScript 的浏览器里，打开这封冬日来信。</p></noscript>
+  </main>
+
+  <dialog class="wish-dialog" id="wish-dialog" aria-labelledby="dialog-title">
+    <form id="wish-form">
+      <button class="icon-button dialog-close" type="button" id="close-dialog" aria-label="关闭"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+      <span class="dialog-star" aria-hidden="true"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg></span>
+      <p class="dialog-kicker">留一点期待给明天</p>
+      <h2 id="dialog-title">许个小小的愿望</h2>
+      <label for="wish-text">你的心愿</label>
+      <textarea id="wish-text" name="wish" maxlength="80" rows="3" placeholder="比如，想见的人都在身边……" required></textarea>
+      <p class="privacy-note">只留在你的这台设备，不会公开。</p>
+      <button class="wish-button dialog-submit" type="submit"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M197.58,129.06,146,110l-19-51.62a15.92,15.92,0,0,0-29.88,0L78,110l-51.62,19a15.92,15.92,0,0,0,0,29.88L78,178l19,51.62a15.92,15.92,0,0,0,29.88,0L146,178l51.62-19a15.92,15.92,0,0,0,0-29.88ZM137,164.22a8,8,0,0,0-4.74,4.74L112,223.85,91.78,169A8,8,0,0,0,87,164.22L32.15,144,87,123.78A8,8,0,0,0,91.78,119L112,64.15,132.22,119a8,8,0,0,0,4.74,4.74L191.85,144ZM144,40a8,8,0,0,1,8-8h16V16a8,8,0,0,1,16,0V32h16a8,8,0,0,1,0,16H184V64a8,8,0,0,1-16,0V48H152A8,8,0,0,1,144,40ZM248,88a8,8,0,0,1-8,8h-8v8a8,8,0,0,1-16,0V96h-8a8,8,0,0,1,0-16h8V72a8,8,0,0,1,16,0v8h8A8,8,0,0,1,248,88Z"/></svg><span>让星星替我记住</span></button>
+    </form>
+  </dialog>
+
+  <dialog class="share-dialog" id="share-dialog" aria-labelledby="share-title">
+    <div class="share-content">
+      <button class="icon-button dialog-close" type="button" id="close-share" aria-label="关闭"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M205.66,194.34a8,8,0,0,1-11.32,11.32L128,139.31,61.66,205.66a8,8,0,0,1-11.32-11.32L116.69,128,50.34,61.66A8,8,0,0,1,61.66,50.34L128,116.69l66.34-66.35a8,8,0,0,1,11.32,11.32L139.31,128Z"/></svg></button>
+      <p class="dialog-kicker">把星光送到 TA 手里</p>
+      <h2 id="share-title">送出这棵圣诞树</h2>
+      <label for="recipient">收件人 <span class="optional">选填</span></label>
+      <input id="recipient" maxlength="18" placeholder="写下 TA 的名字">
+      <label for="message">祝福 <span class="optional">选填</span></label>
+      <input id="message" maxlength="48" placeholder="愿你所念，皆有回响。">
+      <button class="wish-button dialog-submit" id="copy-share" type="button"><svg viewBox="0 0 256 256" aria-hidden="true" focusable="false"><path d="M216,32H88a8,8,0,0,0-8,8V80H40a8,8,0,0,0-8,8V216a8,8,0,0,0,8,8H168a8,8,0,0,0,8-8V176h40a8,8,0,0,0,8-8V40A8,8,0,0,0,216,32ZM160,208H48V96H160Zm48-48H176V88a8,8,0,0,0-8-8H96V48H208Z"/></svg><span>复制专属链接</span></button>
+      <div class="manual-copy" id="manual-copy" hidden><label for="share-link">长按链接复制</label><input id="share-link" readonly></div>
+      <p class="privacy-note">名字和祝福会随链接一起送出。</p>
+    </div>
+  </dialog>
+  <audio id="background-music" data-src="./audio/free-loop-chorus-v1.mp3" data-bytes="510790" preload="auto" loop playsinline hidden></audio>
+</body>
+</html>
