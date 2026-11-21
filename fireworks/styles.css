@@ -1,5 +1,5 @@
-@font-face{font-family:WinterTitle;src:url('./fonts/winter-title.woff2') format('woff2');font-display:swap}
-@font-face{font-family:WinterLetter;src:url('./fonts/winter-letter.woff2') format('woff2');font-display:swap}
+@font-face{font-family:WinterTitle;src:url('./fonts/winter-title.woff2?v=20261121-winter4') format('woff2');font-display:swap}
+@font-face{font-family:WinterLetter;src:url('./fonts/winter-letter.woff2?v=20261121-winter4') format('woff2');font-display:swap}
 :root{color-scheme:dark;--ink:#eee9db;--muted:#9eacbd;--gold:#e7bf8c;--night:#081629;font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--night);color:var(--ink);font-synthesis:none}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}button{appearance:none;font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}button,dialog{touch-action:manipulation}button:focus-visible,[role=button]:focus-visible{outline:1px solid #e7c596;outline-offset:6px}button[hidden],[hidden]{display:none!important}
 #night{position:relative;isolation:isolate;width:100%;height:100svh;overflow:hidden;background:#081629}canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}#landscape{z-index:0;filter:brightness(.9);transform:scale(1.025);transition:transform 3s ease,filter 3s}.is-ready #landscape{transform:scale(1);filter:brightness(1)}#fireworks{z-index:1}#weather{z-index:2}.film-shade{position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(90deg,#06101e22,transparent 35%,transparent 80%,#050e1825),linear-gradient(180deg,#050b160a 40%,transparent 72%,#040c17a8 100%)}
@@ -39,3 +39,42 @@
 @media(max-width:360px){.letter-heading{top:123px;left:24px}h1{font-size:27px}.opening-line{font-size:11px}.night-footer{left:21px;right:20px;gap:7px}.show-control{min-width:147px}.gesture-hint{font-size:8px;max-width:110px}.gesture-hint span{display:block;font-size:7px}.audio-controls{right:20px}}
 @media(max-height:550px) and (min-width:650px){.letter-heading{top:76px}h1{font-size:24px;line-height:1.5}.dedication{margin-bottom:8px}.opening-line{font-size:10px;margin-top:9px}.night-footer{bottom:14px}.show-control{min-width:156px}.show-control #launch{min-height:42px;font-size:10px}#show-stage{font-size:9px;margin-bottom:7px}.show-track{margin-top:7px}.quiet-caption{padding-bottom:10px}}
 @media(prefers-reduced-motion:reduce){.scene-art img{transform:none!important;filter:none!important}}
+
+/* A silver brush inscription with the warm edge of a firework. */
+.letter-heading{max-width:420px;top:clamp(98px,13vh,150px)}
+.letter-heading .dedication{font-size:9px;letter-spacing:.23em;margin-bottom:18px;color:#b6c5d5}
+.letter-heading h1{font-family:WinterTitle,"STKaiti","KaiTi",serif;font-size:clamp(39px,3.8vw,61px);letter-spacing:.025em;line-height:1.22;filter:drop-shadow(0 2px 12px #030b19a6);text-shadow:none}
+.letter-heading h1>span{display:block;width:max-content;background:linear-gradient(155deg,#f4f2e9 12%,#d8e6f4 53%,#ead1a6 96%);background-clip:text;-webkit-background-clip:text;color:transparent}
+.letter-heading .title-to{font-size:.57em;letter-spacing:.13em;margin-bottom:13px;color:#d4e0ed}
+.letter-heading .title-line{font-size:.86em;letter-spacing:.035em}
+.letter-heading .title-finale{position:relative;font-size:1.18em;letter-spacing:.08em;margin-top:7px;padding-right:52px}
+.title-finale svg{position:absolute;left:calc(100% - 51px);top:-11px;width:64px;height:70px;fill:none;stroke:#e7ca95;stroke-width:.8;stroke-linecap:round;opacity:.7;transform:rotate(12deg)}
+.letter-heading .opening-line{font-size:13px;letter-spacing:.06em;color:#aebfd1;margin-top:19px}
+.winter-moon{position:absolute;z-index:0;left:77%;top:17%;width:clamp(118px,12vw,170px);aspect-ratio:1;transform:translate(-50%,-50%);mix-blend-mode:screen;pointer-events:none;opacity:0;transition:opacity 2.4s 1s}
+.winter-moon img{width:100%;height:100%;display:block;filter:brightness(1.15);mix-blend-mode:screen}
+.winter-moon::after{content:"";position:absolute;inset:3%;border-radius:50%;background:radial-gradient(circle,#c5dafa00 34%,#a5caff0c 51%,#a5caff00 70%);filter:blur(5px)}
+.is-ready .winter-moon{opacity:.9}
+@media(max-width:650px){
+  .letter-heading{top:135px;left:27px;max-width:250px}
+  .letter-heading .dedication{font-size:8px;letter-spacing:.13em;margin-bottom:16px}
+  .letter-heading h1{font-size:39px;line-height:1.18}
+  .letter-heading .title-to{font-size:23px;margin-bottom:12px}
+  .letter-heading .title-finale{font-size:47px;margin-top:6px;padding-right:46px}
+  .title-finale svg{width:53px;height:60px;top:-9px;left:calc(100% - 42px)}
+  .letter-heading .opening-line{font-size:11px;margin-top:16px;letter-spacing:.02em}
+  .winter-moon{left:81%;top:22%;width:116px}
+  .gesture-hint{max-width:138px;font-size:8px}
+}
+@media(max-width:360px){
+  .letter-heading{top:124px;left:23px}.letter-heading h1{font-size:32px}
+  .letter-heading .title-to{font-size:20px}.letter-heading .title-finale{font-size:41px}
+  .letter-heading .dedication{font-size:7px;margin-bottom:13px}.letter-heading .opening-line{font-size:10px;margin-top:12px}
+  .winter-moon{left:82%;top:max(166px,24%);width:99px}.gesture-hint{max-width:105px;font-size:8px}
+}
+@media(max-height:550px) and (min-width:650px){
+  .letter-heading{top:75px}.letter-heading h1{font-size:29px;line-height:1.12}
+  .letter-heading .title-to{margin-bottom:8px}.letter-heading .title-finale{margin-top:4px}
+  .letter-heading .dedication{margin-bottom:10px}.letter-heading .opening-line{font-size:10px;margin-top:12px}
+  .title-finale svg{width:45px;height:49px;top:-6px}.winter-moon{top:max(139px,27%);width:100px}
+}
+@media(prefers-reduced-motion:reduce){.winter-moon{transition:none}.title-finale svg{opacity:.6}}

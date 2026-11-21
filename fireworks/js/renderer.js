@@ -2,7 +2,7 @@
 export class SparkRenderer{
   constructor(canvas,maximum){
     this.canvas=canvas;this.gl=canvas.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:false,powerPreference:'high-performance'});
-    this.lines=new Float32Array(maximum*20*2*7);this.points=new Float32Array((maximum+500)*7);
+    this.lines=new Float32Array(maximum*28*2*7);this.points=new Float32Array((maximum+500)*7);
     if(!this.gl){this.ctx=canvas.getContext('2d');this.mode='canvas';return;}
     this.mode='webgl';const g=this.gl;
     const compile=(kind,code)=>{const s=g.createShader(kind);g.shaderSource(s,code);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(s));return s;};
