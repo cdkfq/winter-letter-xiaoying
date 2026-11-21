@@ -1,4 +1,4 @@
-import { MusicLoader } from 'winter/music-loader';
+import { MusicLoader } from './music-loader.js?v=20261121-winter5';
 
 export class WinterAudio extends EventTarget {
   constructor(config) {
@@ -27,7 +27,7 @@ export class WinterAudio extends EventTarget {
       this.effects.connect(limiter);limiter.connect(this.master);
       this.musicGain=this.context.createGain();this.musicGain.gain.value=0;this.musicGain.connect(this.master);
     }
-    if(this.context.state==='suspended')await this.context.resume();
+    if(this.context.state!=='running'&&this.context.state!=='closed')await this.context.resume();
   }
   async play() {
     this.wantsMusic=true;const attempt=++this.attempt;

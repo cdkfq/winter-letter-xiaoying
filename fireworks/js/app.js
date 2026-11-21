@@ -1,7 +1,7 @@
-import { CONFIG } from 'winter/config';
-import { WinterAudio } from 'winter/audio';
-import { WinterLandscape,random } from 'winter/landscape';
-import { Fireworks } from 'winter/fireworks';
+import { CONFIG } from './config.js?v=20261121-winter5';
+import { WinterAudio } from './audio.js?v=20261121-winter5';
+import { WinterLandscape,random } from './landscape.js?v=20261121-winter5';
+import { Fireworks } from './fireworks.js?v=20261121-winter5';
 const $=s=>document.querySelector(s),root=$('#night'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const audio=new WinterAudio(CONFIG.music),landscape=new WinterLandscape($('#scene-art'));
 await Promise.allSettled([landscape.load(),document.fonts.load('32px WinterTitle'),document.fonts.load('16px WinterLetter')]);
@@ -9,25 +9,27 @@ const fireworks=new Fireworks($('#fireworks'),landscape,(kind,power,silent,posit
 const weather=$('#weather'),c=weather.getContext('2d'),touch=$('#sky-touch'),rng=random(291),snow=[];
 let w=0,h=0,dpr=1,frameId=0,lastFrame=0,elapsed=0,ready=false,holding=null,captionTimer=0,focusBeforeNote=null,firstGesture=false,staticPaint=true;
 let actualFrames=0,lastFpsSample=0,fps=0,oldStage='',openingStarted=false,snowEnergy=0,visibleSnow=0,preloadStarted=false;
-function resize(){
-  const width=root.clientWidth,height=root.clientHeight,ratio=Math.min(devicePixelRatio||1,CONFIG.maximumPixelRatio);if(w===width&&h===height&&dpr===ratio)return;
+function resize(force=false){
+  const width=root.clientWidth,height=root.clientHeight,ratio=Math.min(devicePixelRatio||1,CONFIG.maximumPixelRatio);if(!force&&w===width&&h===height&&dpr===ratio)return;
+  cancelSkyPress();
   w=width;h=height;dpr=ratio;landscape.resize(w,h,dpr);fireworks.resize(w,h,dpr);weather.width=Math.round(w*dpr);weather.height=Math.round(h*dpr);c.setTransform(dpr,0,0,dpr,0,0);
   snow.length=0;for(let i=0;i<Math.min(640,Math.max(300,w*h/2300));i++)snow.push({x:rng()*w,y:rng()*h,z:rng(),phase:rng()*Math.PI*2,drift:rng()});
   fireworks.reduced=reduced.matches;staticPaint=true;oldStage='';
 }
-function say(text,duration=6000){clearTimeout(captionTimer);$('#caption').textContent=text;$('#status').textContent=text;if(duration)captionTimer=setTimeout(()=>$('#caption').textContent='雪慢慢落，我们慢慢看。',duration);}
+function say(text,duration=6000){clearTimeout(captionTimer);$('#caption').textContent=text;$('#status').textContent=text;if(duration)captionTimer=setTimeout(()=>$('#caption').textContent='希望你会喜欢',duration);}
 function awaken(){audio.unlock().catch(()=>{});if(!firstGesture){firstGesture=true;if(!audio.wantsMusic)audio.play();}}
 function fire(x,y,power=1){awaken();fireworks.time=elapsed;if(fireworks.manual(x,y,power)){say(power>1.35?'这一朵，攒得久一点，也亮得久一点。':'星火正向你点的那片天空飞去。');staticPaint=true;}}
-touch.addEventListener('pointerdown',event=>{if(holding||event.button>0)return;event.preventDefault();audio.unlock().catch(()=>{});holding={id:event.pointerId,x:event.clientX,y:event.clientY,start:performance.now()};touch.setPointerCapture(event.pointerId);});
+function cancelSkyPress(){const press=holding;holding=null;fireworks.charge=null;if(press&&touch.hasPointerCapture(press.id))touch.releasePointerCapture(press.id);staticPaint=true;}
+touch.addEventListener('pointerdown',event=>{if(holding||event.button>0||note.open)return;event.preventDefault();audio.unlock().catch(()=>{});holding={id:event.pointerId,x:event.clientX,y:event.clientY,start:performance.now()};touch.setPointerCapture(event.pointerId);});
 touch.addEventListener('pointermove',event=>{if(holding&&holding.id===event.pointerId){holding.x=event.clientX;holding.y=event.clientY;}});
-touch.addEventListener('pointerup',event=>{if(!holding||holding.id!==event.pointerId)return;const press=holding;holding=null;fireworks.charge=null;const duration=(performance.now()-press.start)/1000;fire(event.clientX,event.clientY,1+Math.min(1,duration/1.6)*.8);});
-for(const type of ['pointercancel','lostpointercapture'])touch.addEventListener(type,()=>{holding=null;fireworks.charge=null;staticPaint=true;});
+touch.addEventListener('pointerup',event=>{if(!holding||holding.id!==event.pointerId)return;const press=holding;cancelSkyPress();if(note.open||document.elementFromPoint(event.clientX,event.clientY)?.closest('button,dialog,nav,.show-control'))return;const duration=(performance.now()-press.start)/1000;fire(event.clientX,event.clientY,1+Math.min(1,duration/1.6)*.8);});
+for(const type of ['pointercancel','lostpointercapture'])touch.addEventListener(type,cancelSkyPress);
 touch.addEventListener('keydown',event=>{if(event.code==='Space'||event.code==='Enter'){event.preventDefault();if(!event.repeat)fire(w*(.3+Math.random()*.4),h*(.3+Math.random()*.2),1.15);}});
 $('#launch').addEventListener('click',()=>{awaken();fireworks.time=elapsed;if(fireworks.showStarted!==null){fireworks.stopShow();say('让夜空，歇一小会儿。');}else{fireworks.show();say('先点亮一束，再慢慢铺满这片天空。',9000);}staticPaint=true;});
 $('#music-toggle').addEventListener('click',()=>{audio.unlock().catch(()=>{});audio.toggle();firstGesture=true;});
 $('#sound-toggle').addEventListener('click',()=>{audio.unlock().catch(()=>{});audio.setMuted(!audio.muted);});
 $('#lamp-toggle').addEventListener('click',()=>{landscape.setLamp(!landscape.lampLit);$('#lamp-toggle').setAttribute('aria-pressed',String(landscape.lampLit));$('#lamp-toggle').setAttribute('aria-label',landscape.lampLit?'调暗湖岸的路灯':'把湖岸的路灯调亮');audio.effect('switch');say(landscape.lampLit?'给雪地，留一盏暖灯。':'灯暗一点，烟花就更清楚了。');staticPaint=true;});
-const note=$('#note-dialog');$('#note-open').addEventListener('click',()=>{focusBeforeNote=document.activeElement;audio.effect('paper');note.showModal();});
+const note=$('#note-dialog');$('#note-open').addEventListener('click',event=>{event.stopPropagation();cancelSkyPress();focusBeforeNote=$('#note-open');audio.effect('paper');if(!note.open)note.showModal();});
 note.addEventListener('close',()=>focusBeforeNote?.focus({preventScroll:true}));note.addEventListener('click',event=>{if(event.target===note){const r=note.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)note.close();}});
 audio.addEventListener('statechange',({detail:{status,muted,wantsMusic}})=>{
   document.body.classList.toggle('is-playing',status==='playing');document.body.classList.toggle('is-loading',['loading','retrying'].includes(status));document.body.classList.toggle('is-muted',muted);
@@ -58,7 +60,8 @@ function frame(now){
   if(!ready){ready=true;requestAnimationFrame(()=>document.body.classList.add('is-ready'));}
   if(!openingStarted&&!reduced.matches&&elapsed>1.8){openingStarted=true;fireworks.launch(w*.67,h*.37,.95,{color:0,type:'willow',silent:true});}
 }
-window.addEventListener('resize',resize);new ResizeObserver(resize).observe(root);
+window.addEventListener('resize',()=>resize());if(window.ResizeObserver)new ResizeObserver(()=>resize()).observe(root);
+$('#scene-art').addEventListener('load',()=>resize(true));
 reduced.addEventListener('change',()=>{fireworks.reduced=reduced.matches;fireworks.stopShow();fireworks.rockets.length=0;fireworks.sparks.length=0;fireworks.halos.length=0;fireworks.renderer.clear();holding=null;fireworks.charge=null;staticPaint=true;});
 function resumeFrames(){lastFrame=performance.now();staticPaint=true;if(!frameId)frameId=requestAnimationFrame(frame);}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frameId);frameId=0;holding=null;fireworks.charge=null;}else resumeFrames();});

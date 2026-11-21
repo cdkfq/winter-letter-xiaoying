@@ -7,10 +7,9 @@
   <meta name="description" content="给孝颖，一场盛大的烟花秀。听首歌，看烟花升空，看雪慢慢落满这一晚。">
   <title>给孝颖，一场盛大的烟花秀</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-  <link rel="preload" href="./fonts/winter-title.woff2?v=20261121-winter4" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="./fonts/winter-letter.woff2?v=20261121-winter4" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./styles.css?v=20261121-winter4">
-  <script type="importmap">{"imports":{"winter/config":"./js/config.js?v=20261121-winter4","winter/audio":"./js/audio.js?v=20261121-winter4","winter/music-loader":"./js/music-loader.js?v=20261121-winter4","winter/landscape":"./js/landscape.js?v=20261121-winter4","winter/fireworks":"./js/fireworks.js?v=20261121-winter4","winter/renderer":"./js/renderer.js?v=20261121-winter4"}}</script>
+  <link rel="preload" href="./fonts/winter-title.woff2?v=20261121-winter5" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/winter-letter.woff2?v=20261121-winter5" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./styles.css?v=20261121-winter5">
 </head>
 <body>
   <main id="night" aria-label="冬天的雪夜，可以听歌、放烟花、看一封小纸条"><style id="theme-navigation-css">
@@ -18,7 +17,7 @@
 .theme-switch a{color:#adbabb;text-decoration:none;padding:9px 16px;border-radius:28px;display:flex;gap:7px;align-items:center;min-height:32px;outline-offset:3px}.theme-switch a:before{content:"";display:inline-block;width:3px;height:3px;border:1px solid currentColor;border-radius:50%;opacity:.55}.theme-switch a[aria-current=page]{background:#e4d4ae19;color:#efdfb9}.theme-switch a[aria-current=page]:before{background:#e9cea2;border-color:#e9cea2;box-shadow:0 0 7px #e9cea288;opacity:1}.theme-switch a:hover{color:#fff0cb}.theme-switch a:focus-visible{outline:1px solid #eed4a4}
 @media(max-width:700px){.theme-switch{top:max(23px,calc(env(safe-area-inset-top) + 12px));font-size:10px}.theme-switch a{padding:8px 13px;min-height:30px}.postcard>.theme-switch{top:auto;bottom:max(16px,calc(env(safe-area-inset-bottom) + 12px))}.postcard .bottom-area{bottom:calc(69px + env(safe-area-inset-bottom,0px))}.postcard .sign-off{display:none}}
 @media(max-height:550px) and (min-width:701px){.theme-switch{top:14px;font-size:9px}.theme-switch a{padding:7px 12px;min-height:28px}}
-</style><nav class="theme-switch" id="theme-switch" aria-label="切换冬日主题"><a href="../?v=20261121-15-themes">圣诞树</a><a href="./?v=20261121-winter4" aria-current="page">雪夜烟花</a></nav>
+</style><nav class="theme-switch" id="theme-switch" aria-label="切换冬日主题"><a href="../?v=20261121-16-themes">圣诞树</a><a href="./?v=20261121-winter5" aria-current="page">雪夜烟花</a></nav>
     <picture class="scene-art" aria-hidden="true"><source media="(max-aspect-ratio: 95/100)" srcset="./art/winter-night-portrait-v4.webp"><img id="scene-art" src="./art/winter-night-wide-v4.webp" alt="" fetchpriority="high" decoding="async"></picture>
     <div class="winter-moon" aria-hidden="true"><img src="./art/quarter-moon.webp" alt="" decoding="async"></div>
     <div class="lamp-shade" aria-hidden="true"></div><div id="snow-light" aria-hidden="true"></div>
@@ -30,30 +29,32 @@
     <header class="letter-heading">
       <p class="dedication"><span aria-hidden="true"></span> 雪夜 · 烟花 · 一首歌</p>
       <h1 aria-label="给孝颖，一场盛大的烟花秀"><span class="title-to">给孝颖，</span><span class="title-line">一场盛大的</span><span class="title-finale">烟花秀<svg viewBox="0 0 100 85" aria-hidden="true"><path d="M8 81Q30 64 40 34M40 34l-3-17m3 17 13-12M40 34l-14-7M40 34l15 5M61 13l2-7m-2 7 7 1M75 43l8-6m-8 6 9 3"/></svg></span></h1>
-      <p class="opening-line">雪慢慢落，这首歌慢慢听。</p>
+      <p class="opening-line">我可是记得你很喜欢这首歌哦</p>
     </header>
     <div class="audio-controls" aria-label="音乐与声音">
       <button id="music-toggle" type="button" aria-label="播放冯提莫的 What Are Words" aria-pressed="false"><span class="music-bars" aria-hidden="true"><i></i><i></i><i></i></span><span id="music-label">听首歌</span></button>
       <button id="sound-toggle" type="button" class="round-button" aria-label="关闭声音" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="sound-wave" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/><path class="sound-slash" d="m4 3 16 18"/></svg></button>
     </div>
     <button id="lamp-toggle" class="scene-hit" type="button" aria-label="调暗湖岸的路灯" aria-pressed="true"><span class="object-hint">把灯留亮一点</span></button>
-    <button id="note-open" class="scene-hit" type="button" aria-label="看看长椅上的小纸条"><span class="note-mark" aria-hidden="true">✧</span><span class="object-hint">一张纸条</span></button>
+    <button id="note-open" class="scene-hit" type="button" aria-label="打开长椅上的信封" aria-haspopup="dialog"><span class="note-mark" aria-hidden="true">✧</span><span class="object-hint">一张纸条</span></button>
     <footer class="night-footer">
-      <div class="quiet-caption"><p id="caption" aria-live="polite">雪慢慢落，我们慢慢看。</p><p id="music-status">What Are Words · 冯提莫</p></div>
+      <div class="quiet-caption"><p id="caption" aria-live="polite">希望你会喜欢</p><p id="music-status">What Are Words · 冯提莫</p></div>
       <div class="show-control"><p id="show-stage">从一束微光，到满天绽放</p><button id="launch" type="button" aria-pressed="false"><span class="launch-symbol" aria-hidden="true">✧</span><span id="launch-label">点燃这场烟花</span></button><div class="show-track" aria-hidden="true"><i id="show-progress"></i></div></div>
       <p class="gesture-hint" id="gesture-hint">点一片天空，让烟花飞向那里<span>长按松手，攒一朵更大的</span></p>
     </footer>
     <dialog id="note-dialog" aria-labelledby="note-title">
-      <form method="dialog"><button class="note-close" type="submit" aria-label="收好纸条">×</button></form>
+      <form method="dialog"><button class="note-close" type="submit" aria-label="关闭信件">×</button></form>
+      <div class="note-body">
       <p class="note-overline">留在这个雪夜的小纸条</p>
       <h2 id="note-title">孝颖，</h2>
       <p>听到这首歌的时候，<br>觉得应该配一场雪。</p>
       <p>再添几朵烟花，<br>就刚刚好了。</p>
-      <p>你随便点点，<br>今晚的天空归你管。</p>
-      <form method="dialog"><button class="keep-note" type="submit">收好，继续看烟花 <span aria-hidden="true">↗</span></button></form>
+      <p>恭喜你发现了这个小彩蛋，<br>希望可以给你带来一点点开心</p>
+      <p class="note-signature">罗小啰</p>
+      </div>
     </dialog>
     <p id="status" class="sr-only" role="status"></p>
   </main>
-  <script type="module">import('./js/app.js?v=20261121-winter4').catch(error=>{console.error(error);document.getElementById('loading').innerHTML='<span>夜色暂时没加载好，刷新一下再试试。</span>';});</script>
+  <script type="module">import('./js/app.js?v=20261121-winter5').catch(error=>{console.error(error);document.getElementById('loading').innerHTML='<span>夜色暂时没加载好，刷新一下再试试。</span>';});</script>
 </body>
 </html>

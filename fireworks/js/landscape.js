@@ -4,15 +4,18 @@ export class WinterLandscape{
   constructor(image){this.image=image;this.lampLit=true;this.anchors={};}
   async load(){try{await this.image.decode();}catch{document.body.classList.add('art-fallback');}}
   resize(w,h,dpr){
-    this.w=w;this.h=h;this.dpr=dpr;this.narrow=w/h<.95;
-    const iw=this.narrow?1024:1536,ih=this.narrow?1536:1024,scale=Math.max(w/iw,h/ih);
+    this.w=w;this.h=h;this.dpr=dpr;this.narrow=matchMedia('(max-aspect-ratio: 95/100)').matches;
+    const iw=this.image.naturalWidth||(this.narrow?1024:1536),ih=this.image.naturalHeight||(this.narrow?1536:1024),scale=Math.max(w/iw,h/ih);
     this.scale=scale;this.offsetX=(w-iw*scale)*(this.narrow?.75:.5);this.offsetY=(h-ih*scale)*.5;this.iw=iw;this.ih=ih;
     const point=(x,y)=>({x:x*iw*scale+this.offsetX,y:y*ih*scale+this.offsetY});
     this.anchors={lamp:point(this.narrow?.844:.886,this.narrow?.57:.36),note:point(this.narrow?.555:.8,this.narrow?.84:.805)};
     this.skyBottom=point(.5,this.narrow?.57:.50).y;this.shoreY=point(.5,.67).y;
     this.water=this.narrow?[[.10,.67],[.59,.675],[.78,.73],[.65,.78],[.23,.86],[.08,.8]]:[[.10,.66],[.83,.65],[.83,.715],[.69,.78],[.49,.86],[.25,.88],[.09,.77]];
     for(const [key,p] of Object.entries(this.anchors)){
-      const el=document.getElementById(key==='lamp'?'lamp-toggle':'note-open');el.style.left=Math.max(23,Math.min(w-23,p.x))+'px';el.style.top=Math.max(23,Math.min(h-145,p.y))+'px';
+      const el=document.getElementById(key==='lamp'?'lamp-toggle':'note-open');
+      // Keep each hit area on the painted object, including short mobile viewports.
+      const halfW=el.offsetWidth/2,halfH=el.offsetHeight/2;
+      el.style.left=Math.max(halfW,Math.min(w-halfW,p.x))+'px';el.style.top=Math.max(halfH,Math.min(h-halfH,p.y))+'px';
     }
     const lamp=this.anchors.lamp;document.documentElement.style.setProperty('--lamp-x',lamp.x+'px');document.documentElement.style.setProperty('--lamp-y',lamp.y+'px');
   }

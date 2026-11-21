@@ -1,6 +1,6 @@
-import { CONFIG } from 'winter/config';
-import { random } from 'winter/landscape';
-import { SparkRenderer } from 'winter/renderer';
+import { CONFIG } from './config.js?v=20261121-winter5';
+import { random } from './landscape.js?v=20261121-winter5';
+import { SparkRenderer } from './renderer.js?v=20261121-winter5';
 
 const TAU = Math.PI * 2;
 const TYPES = ['peony', 'chrysanthemum', 'willow', 'ring', 'saturn', 'double', 'palm', 'crossette'];
@@ -15,15 +15,21 @@ export class Fireworks {
     this.scheduled = []; this.secondary = []; this.count = 0; this.burstCount = 0;
     this.time = 0; this.charge = null; this.reduced = false; this.lastPower = 0;
     this.light = { x: 0, intensity: 0, color: CONFIG.fireworkPalette[0] };
-    this.showStarted = null; this.showDuration = 60; this.cycle = 0;
+    this.showStarted = null; this.showDuration = 70; this.cycle = 0;
     this.stage = 'idle'; this.lastBurst = null; this.lastLaunch = null; this.lastManual = -10;
     this.typesSeen = new Set(); this.colorsSeen = new Set();
   }
   resize(w, h, dpr) {
+    if (this.w && this.h) {
+      const sx=w/this.w,sy=h/this.h,size=Math.min(w,h)/Math.min(this.w,this.h);
+      const point=p=>{p.x*=sx;p.y*=sy;};
+      for(const r of this.rockets){point(r);r.sx*=sx;r.sy*=sy;r.tx*=sx;r.ty*=sy;r.bend*=sx;r.trail.forEach(point);}
+      for(const p of this.sparks){point(p);p.vx*=sx;p.vy*=sy;p.gravity*=sy;p.size*=size;for(let i=0;i<p.history.length;i+=2){p.history[i]*=sx;p.history[i+1]*=sy;}}
+      for(const p of [...this.halos,...this.secondary,...this.scheduled]){point(p);if(p.sx!==undefined)p.sx*=sx;}
+      if(this.lastLaunch)point(this.lastLaunch);if(this.lastBurst)point(this.lastBurst);this.light.x*=sx;
+    }
     this.w = w; this.h = h; this.dpr = dpr; this.renderer.resize(w, h, dpr);
-    this.rockets.length = this.sparks.length = this.halos.length = this.secondary.length = 0;
     this.charge = null;
-    if (this.showStarted !== null) { this.showStarted = this.time; this.scheduleCycle(); }
   }
   safeTarget(x, y) { return { x: clamp(x, 1, this.w - 1), y: clamp(y, 1, this.h - 1) }; }
   manual(x, y, power = 1) {
@@ -68,8 +74,8 @@ export class Fireworks {
     [0, 3.8, 7.8].forEach((t, i) => volley(t, 1, .58 + i * .08, .6, i));
     [12, 15.4, 18.8, 22.2].forEach((t, i) => volley(t, 2, .84, .9, i + 1));
     [26, 28.5, 31, 33.5, 36].forEach((t, i) => volley(t, 4, 1.04, 1, i + 2));
-    [39, 41.1, 43.2, 45.3, 47.4, 49.5].forEach((t, i) => volley(t, 7, 1.24, 1, i));
-    volley(51, 10, 1.5, 1, cycle); volley(55.8, 1, .63, .9, 0);
+    [39, 41.1, 43.2, 45.3, 47.4, 49.5, 51.6, 53.7, 55.8, 57.9, 60].forEach((t, i) => volley(t, 7, 1.24, 1, i));
+    volley(61, 10, 1.5, 1, cycle); volley(65.8, 1, .63, .9, 0);
     this.scheduled.sort((a, b) => a.at - b.at);
   }
   stopShow() { this.scheduled.length = 0; this.showStarted = null; this.stage = 'idle'; }
@@ -77,7 +83,7 @@ export class Fireworks {
   get intensity() {
     if (this.showStarted === null) return 0;
     const t = this.showElapsed;
-    return t < 39 ? .08 + .92 * smooth(t / 39) : t < 52 ? 1 : 1 - smooth((t - 52) / 8);
+    return t < 39 ? .08 + .92 * smooth(t / 39) : t < 62 ? 1 : 1 - smooth((t - 62) / 8);
   }
   burst(shell) {
     const { x, y, power, color, type, silent } = shell, rng = this.rng;
@@ -137,7 +143,7 @@ export class Fireworks {
     if (this.showStarted !== null) {
       if (time - this.showStarted >= this.showDuration) { this.showStarted += this.showDuration; ++this.cycle; this.scheduleCycle(); }
       const t = this.showElapsed;
-      this.stage = t < 12 ? 'kindling' : t < 26 ? 'gathering' : t < 39 ? 'blooming' : t < 53 ? 'finale' : 'afterglow';
+      this.stage = t < 12 ? 'kindling' : t < 26 ? 'gathering' : t < 39 ? 'blooming' : t < 63 ? 'finale' : 'afterglow';
     }
     while (this.scheduled.length && time >= this.scheduled[0].at) { const shot = this.scheduled.shift(); this.launch(shot.x, shot.y, shot.power, shot); }
     for (let i = this.secondary.length - 1; i >= 0; i--) if (time >= this.secondary[i].at) { const shot = this.secondary.splice(i, 1)[0]; this.burst(shot); }
