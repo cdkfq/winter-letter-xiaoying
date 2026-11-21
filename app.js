@@ -590,10 +590,17 @@
   // where the media element's volume setting follows the device volume.
   const backgroundMusic=$('background-music');
   let preparedMusicSource='';
-  let audio=null,master=null,musicOn=false,playAttempt=0,musicReady=false,musicLoading=null;
+  let audio=null,master=null,soundOn=false,musicOn=false,playAttempt=0,musicReady=false,musicLoading=null;
   function ensureAudio() {
     if(!audio) {const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw Error('no audio');audio=new AC({latencyHint:'playback'});master=audio.createGain();master.gain.value=.18;master.connect(audio.destination);}
     return audio;
+  }
+  function unlockChimes() {
+    // Unlock the local sound effects in the tap, before any music download.
+    try {
+      ensureAudio();if(audio.state==='suspended')audio.resume().catch(()=>{});
+      master.gain.cancelScheduledValues(audio.currentTime);master.gain.setTargetAtTime(.18,audio.currentTime,.1);
+    } catch(_){}
   }
   function tone(midi,when,duration=2,volume=.2) {
     if(!audio||!master)return;
@@ -605,10 +612,11 @@
     }
   }
   function musicUI() {
-    const pending=musicOn&&!musicReady,label=pending?'取消音乐播放':musicOn?'关闭音乐':'开启音乐';
-    $('music').setAttribute('aria-pressed',String(musicOn));$('music').setAttribute('aria-busy',String(pending));
-    $('music').setAttribute('aria-label',label);$('music').title=pending?'音乐准备中':label;
-    $('music').querySelector('.music-off').hidden=musicOn;$('music').querySelector('.music-on').hidden=!musicOn;
+    const pending=musicOn&&!musicReady,retry=soundOn&&!musicOn;
+    const label=retry?'音效已开启，点击重试背景音乐':soundOn?'关闭声音':'开启声音';
+    $('music').setAttribute('aria-pressed',String(soundOn));$('music').setAttribute('aria-busy',String(pending));
+    $('music').setAttribute('aria-label',label);$('music').title=pending?'音效已开启，背景音乐准备中':label;
+    $('music').querySelector('.music-off').hidden=soundOn;$('music').querySelector('.music-on').hidden=!soundOn;
   }
   function prepareMusic() {
     if(musicReady)return Promise.resolve();
@@ -620,8 +628,8 @@
         if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
         preparedMusicSource=JSON.parse($('music-data').textContent);
       } else {
-        // The normal website keeps its HTML small and silently caches the song
-        // after its first frame. Only a complete download is handed to the player.
+        // Download after sound is enabled, while local chimes already work.
+        // Only a complete download is handed to the background music player.
         let lastError;
         for(let attempt=0;attempt<2;attempt++) {
           const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),25000);
@@ -651,12 +659,15 @@
   }
   function stopMusic() {
     musicOn=false;playAttempt++;backgroundMusic.pause();musicUI();
+  }
+  function stopSound() {
+    soundOn=false;stopMusic();
     if(audio&&master){master.gain.cancelScheduledValues(audio.currentTime);master.gain.setTargetAtTime(.0001,audio.currentTime,.05);}
   }
   async function playMusic(announce=false) {
     const attempt=++playAttempt;musicOn=true;musicUI();
     try {
-      if(!musicReady){if(announce)toast('正在准备音乐，稍等一下');await prepareMusic();}
+      if(!musicReady){if(announce)toast('音效已开启，背景音乐正在准备');await prepareMusic();}
       if(attempt!==playAttempt||!musicOn||document.hidden)return;
       if(backgroundMusic.error||backgroundMusic.src!==preparedMusicSource){backgroundMusic.src=preparedMusicSource;backgroundMusic.load();}
       // When already prepared, call play directly within the tap for mobile Safari.
@@ -666,15 +677,18 @@
       if(announce)toast('让这首歌，陪你看雪');
     } catch(error) {
       if(attempt!==playAttempt||!musicOn)return;
-      stopMusic();toast(error.name==='NotAllowedError'?'音乐准备好了，轻触右上角播放':'音乐暂时没能加载，再试一次吧');
+      stopMusic();toast(error.name==='NotAllowedError'?'音效可以用了，再点右上角播放音乐':'音乐暂时没能加载，音效仍可使用；点右上角重试');
     }
   }
-  $('music').addEventListener('click',()=>{if(musicOn)stopMusic();else playMusic(true);});
+  $('music').addEventListener('click',()=> {
+    if(soundOn&&musicOn){stopSound();return;}
+    soundOn=true;unlockChimes();playMusic(true);
+  });
   backgroundMusic.addEventListener('error',()=> {
-    if(musicOn){stopMusic();toast('音乐暂时没能加载，再试一次吧');}
+    if(musicOn){stopMusic();toast('音乐暂时没能加载，音效仍可使用；点右上角重试');}
   });
   function chime(major=false) {
-    if(!musicOn||backgroundMusic.paused)return;
+    if(!soundOn||document.hidden)return;
     try {
       ensureAudio();if(audio.state==='suspended')audio.resume().catch(()=>{});
       master.gain.cancelScheduledValues(audio.currentTime);master.gain.setTargetAtTime(.18,audio.currentTime,.1);
@@ -689,15 +703,13 @@
   document.addEventListener('visibilitychange',()=> {
     active=!document.hidden;
     if(!active){cancelAnimationFrame(frameId);pauseForBackground();}
-    else {if(musicOn)playMusic();start();}
+    else {if(soundOn)unlockChimes();if(musicOn)playMusic();start();}
   });
   const motionChange=e=>{reduced=e.matches;start();};
   if(motionQuery.addEventListener)motionQuery.addEventListener('change',motionChange);else motionQuery.addListener(motionChange);
   window.addEventListener('resize',resize);
   window.addEventListener('pagehide',()=>{active=false;cancelAnimationFrame(frameId);pauseForBackground();});
-  window.addEventListener('pageshow',e=>{if(e.persisted){active=!document.hidden;if(active){if(musicOn)playMusic();start();}}});
+  window.addEventListener('pageshow',e=>{if(e.persisted){active=!document.hidden;if(active){if(soundOn)unlockChimes();if(musicOn)playMusic();start();}}});
   createTree();makePineSprites();makeOrnamentSprites();makeSnowSprite();resize();introStart=performance.now()/1000;start();
-  // Prepare music on opening, after allowing the artwork its first frame.
-  requestAnimationFrame(()=>prepareMusic().catch(()=>{}));
   if(document.fonts)document.fonts.ready.then(resize);
 })();
