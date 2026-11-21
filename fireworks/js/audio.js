@@ -4,6 +4,7 @@ export class WinterAudio extends EventTarget {
     this.buffer=null; this.source=null; this.pending=null; this.status='idle';
     this.wantsMusic=false; this.muted=false; this.offset=0; this.startedAt=0;
     this.volumeTarget=config.volume; this.lastEffect=-10; this.effectCount=0; this.attempt=0;
+    this.receivedBytes=0;this.downloadAttempt=0;this.lastError=null;
   }
   update(status) { this.status=status; this.dispatchEvent(new CustomEvent('statechange',{detail:{status,muted:this.muted,wantsMusic:this.wantsMusic}})); }
   async unlock() {
@@ -28,20 +29,47 @@ export class WinterAudio extends EventTarget {
       if(this.wantsMusic&&attempt===this.attempt)this.start();
       else if(!this.source)this.update('paused');
     }catch(error){
+      this.lastError=error.message;
       console.warn('Background music:',error.message);
       if(attempt===this.attempt){this.wantsMusic=false;this.update('error');}
     }
   }
   async download(){
-    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),this.config.downloadTimeoutMs);
-    try{
-      const response=await fetch(this.config.src,{signal:controller.signal,cache:'force-cache'});
-      if(!response.ok)throw new Error(`Music HTTP ${response.status}`);
-      const bytes=await response.arrayBuffer();if(bytes.byteLength<10000)throw new Error('Music file is incomplete');
-      const buffer=await this.context.decodeAudioData(bytes);
-      if(buffer.duration<10)throw new Error('Music recording is too short');
-      return buffer;
-    }finally{clearTimeout(timer);}
+    const key=new URL(this.config.src,location.href).href;let cache=null;
+    try{cache=await caches.open('winter-letter-music-v1');}catch{}
+    const verify=async bytes=>{
+      if(bytes.byteLength!==this.config.bytes)throw new Error('Music file is incomplete');
+      if(globalThis.crypto?.subtle){const digest=await crypto.subtle.digest('SHA-256',bytes),hex=Array.from(new Uint8Array(digest),v=>v.toString(16).padStart(2,'0')).join('');if(hex!==this.config.sha256)throw new Error('Music integrity check failed');}
+    };
+    let bytes;
+    if(cache){try{const saved=await cache.match(key);if(saved){const data=await saved.arrayBuffer();await verify(data);bytes=data;}}catch{await cache.delete(key).catch(()=>{});}}
+    if(!bytes){
+      this.receivedBytes=0;const size=262144,total=this.config.bytes;
+      const block=async(start,end)=>{
+        for(let attempt=0;attempt<2;attempt++){
+          this.downloadAttempt=attempt+1;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),this.config.downloadTimeoutMs);
+          try{
+            const response=await fetch(key,{headers:{Range:`bytes=${start}-${end}`},cache:'no-store',signal:controller.signal});
+            if(!response.ok)throw new Error(`Music HTTP ${response.status}`);
+            const data=await response.arrayBuffer();
+            if(response.status===200){if(data.byteLength!==total)throw new Error('Music file is incomplete');return{data,full:true};}
+            if(response.status!==206||response.headers.get('Content-Range')!==`bytes ${start}-${end}/${total}`||data.byteLength!==end-start+1)throw new Error('Music range is incomplete');
+            return{data,full:false};
+          }catch(error){if(attempt||!this.wantsMusic)throw error;}finally{clearTimeout(timer);}
+        }
+      };
+      const first=await block(0,Math.min(total-1,size-1));
+      if(first.full)bytes=first.data;
+      else{
+        const combined=new Uint8Array(total);combined.set(new Uint8Array(first.data),0);this.receivedBytes=first.data.byteLength;this.dispatchEvent(new Event('progress'));
+        let next=size,failed=false;
+        const worker=async()=>{while(next<total&&!failed){const start=next;next+=size;try{const part=await block(start,Math.min(total-1,start+size-1));if(part.full)throw new Error('Server changed its range response');combined.set(new Uint8Array(part.data),start);this.receivedBytes+=part.data.byteLength;this.dispatchEvent(new Event('progress'));}catch(error){failed=true;throw error;}}};
+        const outcomes=await Promise.allSettled([worker(),worker(),worker(),worker()]);const failure=outcomes.find(row=>row.status==='rejected');if(failure)throw failure.reason;bytes=combined.buffer;
+      }
+      await verify(bytes);if(cache)try{await cache.put(key,new Response(bytes.slice(0),{headers:{'Content-Type':'audio/mpeg'}}));}catch{}
+    }
+    this.receivedBytes=bytes.byteLength;this.dispatchEvent(new Event('progress'));
+    const buffer=await this.context.decodeAudioData(bytes);if(buffer.duration<Math.max(10,this.config.durationSeconds-.5))throw new Error('Music recording is incomplete');return buffer;
   }
   start(){
     if(!this.wantsMusic||!this.buffer||this.source)return;
@@ -87,5 +115,5 @@ export class WinterAudio extends EventTarget {
     filter.type='bandpass';filter.frequency.value=cutoff;filter.Q.value=.7;env.gain.setValueAtTime(gain,now);env.gain.exponentialRampToValueAtTime(.0001,now+duration);
     source.connect(filter);filter.connect(env);env.connect(this.effects);source.start();source.onended=()=>{source.disconnect();filter.disconnect();env.disconnect();};
   }
-  snapshot(){return{status:this.status,wantsMusic:this.wantsMusic,muted:this.muted,hasBuffer:!!this.buffer,duration:this.buffer?.duration??0,offset:this.offset,contextState:this.context?.state??'none',gain:this.musicGain?.gain.value??0,outputGain:(this.musicGain?.gain.value??0)*(this.master?.gain.value??1),masterGain:this.master?.gain.value??1};}
+  snapshot(){return{status:this.status,wantsMusic:this.wantsMusic,muted:this.muted,hasBuffer:!!this.buffer,duration:this.buffer?.duration??0,offset:this.offset,contextState:this.context?.state??'none',gain:this.musicGain?.gain.value??0,outputGain:(this.musicGain?.gain.value??0)*(this.master?.gain.value??1),masterGain:this.master?.gain.value??1,receivedBytes:this.receivedBytes,totalBytes:this.config.bytes,downloadAttempt:this.downloadAttempt,lastError:this.lastError};}
 }

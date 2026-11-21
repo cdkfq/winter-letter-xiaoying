@@ -44,6 +44,7 @@ function drawWeather(dt){
     if(p.z>.88){c.beginPath();for(let j=0;j<3;j++){const a=j*Math.PI/3+elapsed*.08+p.phase,xx=Math.cos(a)*radius,yy=Math.sin(a)*radius;c.moveTo(p.x-xx,p.y-yy);c.lineTo(p.x+xx,p.y+yy);}c.strokeStyle='#e3edf6';c.lineWidth=.65;c.stroke();}else{c.beginPath();c.arc(p.x,p.y,radius,0,Math.PI*2);c.fill();}
   }c.globalAlpha=1;$('#snow-light').style.opacity=String(fireworks.light.intensity*.13);
 }
+audio.addEventListener('progress',()=>{if(audio.status==='loading')$('#music-label').textContent='载歌 '+Math.min(100,Math.floor(audio.receivedBytes/audio.config.bytes*100))+'%';});
 const labels={idle:'从一束微光，到满天绽放',kindling:'一束微光，先向夜空问好',gathering:'星火相逢，夜空慢慢亮起',blooming:'再多一点，再亮一点',finale:'这一刻，整片天空都亮了',afterglow:'把余光，留给雪夜'};
 function updateShow(){const active=fireworks.showStarted!==null;if(oldStage!==fireworks.stage){oldStage=fireworks.stage;$('#show-stage').textContent=labels[oldStage];$('#launch-label').textContent=active?'收起这场烟花':'点燃这场烟花';$('#launch').setAttribute('aria-pressed',String(active));document.body.classList.toggle('show-running',active);}$('#show-progress').style.transform=`scaleX(${active?Math.min(1,(elapsed-fireworks.showStarted)/43):0})`;}
 function frame(now){
